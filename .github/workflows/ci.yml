@@ -4,21 +4,20 @@ on:
   push:
     branches: [ "main" ]
 
+env:
+  REPO_NAME: actions-backend
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      REPO_NAME: actions_backend
     steps:
     - uses: actions/checkout@v4
     - name: Login into Docker
       env: 
         DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
         DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
-      run:
-        docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag ${{REPO_NAME}}:$(date +%s)
+      run: docker build . --file Dockerfile --tag ${{env.REPO_NAME}}:$(date +%s)
     - name: Push to DockerHUB
-      run: docker push rsmonte/${{REPO_NAME}}:latest
-      
+      run: docker push rsmonte/${{env.REPO_NAME}}:latest
