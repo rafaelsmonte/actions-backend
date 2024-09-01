@@ -21,3 +21,13 @@ jobs:
       run: docker build -t ${{env.REPO_NAME}}:latest .
     - name: Push to DockerHUB
       run: docker push ${{env.REPO_NAME}}:latest
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Pulling Docker Image
+        run: docker pull ${{env.REPO_NAME}}:latest
+      - name: Removing Old Docker Image
+        run: docker rmi $(docker images -q -f "dangling=true")
+      - name: Starting Docker Image
+        run: docker run -d -p 3000:3000 ${{env.REPO_NAME}}:latest
+  
