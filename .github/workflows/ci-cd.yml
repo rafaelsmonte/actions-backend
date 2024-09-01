@@ -24,6 +24,11 @@ jobs:
   deploy:
     runs-on: self-hosted
     steps:
+      - name: Login into Docker
+        env: 
+          DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
+          DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+        run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
       - name: Pulling Docker Image
         run: docker pull ${{env.REPO_NAME}}:latest
       - name: Removing Old Docker Image
