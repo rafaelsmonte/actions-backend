@@ -36,4 +36,4 @@ jobs:
       - name: Removing Old Docker Image
         run: sudo docker rm -f ${{env.REPO_NAME}} || true
       - name: Starting Docker Image
-        run: sudo docker run -d -p 3000:3000 --name ${{env.REPO_NAME}} ${{env.REPO_NAME}}:latest
+        run: sudo docker run -d -p 3000:3000 --name actions-backend-server ${{env.REPO_NAME}}:latest
