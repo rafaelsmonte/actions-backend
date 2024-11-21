@@ -22,18 +22,11 @@ jobs:
         run: npm ci
       - name: Run tests with coverage
         run: npm test -- --coverage
-      - name: Extract Coverage Percentage
-        run: |
-          COVERAGE=$(grep -Po 'All files\s*\|\s*\K\d+\.\d+' coverage/lcov-report/index.html)
-          echo "COVERAGE=$COVERAGE" >> $GITHUB_ENV
-      - name: Create Coverage Badge
-        run: |
-          curl -o coverage-badge.svg "https://img.shields.io/badge/Coverage-${COVERAGE}%25-brightgreen"
-      - name: Upload Coverage Badge
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage-badge
-          path: coverage-badge.svg
+      - name: Update Coverage Badge
+        # GitHub actions: default branch variable
+        # https://stackoverflow.com/questions/64781462/github-actions-default-branch-variable
+        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        uses: we-cli/coverage-badge-action@main
   sonar:
     name: Sonar
     runs-on: ubuntu-latest
