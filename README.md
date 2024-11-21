@@ -1,3 +1,4 @@
 # actions-backend
 
-[![codecov](https://codecov.io/gh/USERNAME/REPO/branch/main/graph/badge.svg)](https://codecov.io/gh/USERNAME/REPO)
+[![Coverage Status](https://coveralls.io/repos/github/rafaelsmonte/REPO/badge.svg?branch=main)](https://coveralls.io/github/rafaelsmonte/REPO?branch=main)
+
