@@ -30,3 +30,9 @@ jobs:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }} # Add COVERALLS_REPO_TOKEN in your GitHub repository secrets
         run: |
           cat coverage/lcov.info | npx coveralls
+      - name: testando sem serviços externos
+        run: |
+          npx update-badge
+      - uses: mikeal/publish-to-github-action@master
+        env: 
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
