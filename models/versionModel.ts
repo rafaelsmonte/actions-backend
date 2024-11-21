@@ -7,3 +7,9 @@ export const versionModel = {
         return { version: "1.0.1" };  
     }
 };
+
+export const versionModel2 = {
+    getVersion: (): Version => {
+        return { version: "1.0.1" };  
+    }
+};

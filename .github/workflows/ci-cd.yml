@@ -8,6 +8,32 @@ env:
   REPO_NAME: rsmonte/actions-backend
 
 jobs:
+  test:
+    name: Run Jest Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests with coverage
+        run: npm test -- --coverage
+      - name: Extract Coverage Percentage
+        run: |
+          COVERAGE=$(grep -Po 'All files\s*\|\s*\K\d+\.\d+' coverage/lcov-report/index.html)
+          echo "COVERAGE=$COVERAGE" >> $GITHUB_ENV
+      - name: Create Coverage Badge
+        run: |
+          curl -o coverage-badge.svg "https://img.shields.io/badge/Coverage-${COVERAGE}%25-brightgreen"
+      - name: Upload Coverage Badge
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-badge
+          path: coverage-badge.svg
   sonar:
     name: Sonar
     runs-on: ubuntu-latest
@@ -33,7 +59,6 @@ jobs:
       run: docker build -t ${{env.REPO_NAME}}:latest .
     - name: Push to DockerHub
       run: docker push ${{env.REPO_NAME}}:latest
-
   deploy:
     runs-on: self-hosted
     needs: build  
