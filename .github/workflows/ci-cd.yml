@@ -1,71 +1,31 @@
-name: Docker Image CI
+name: Test Coverage
 
 on:
   push:
-    branches: [ "main" ]
-
-env:
-  REPO_NAME: rsmonte/actions-backend
-
+    branches:
+      - main
+  pull_request:
 jobs:
   test:
-    name: Run Jest Tests
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '16'
+
       - name: Install dependencies
-        run: npm ci
-      - name: Run tests with coverage
-        run: npm test -- --coverage
-      - name: Update Coverage Badge
-        # GitHub actions: default branch variable
-        # https://stackoverflow.com/questions/64781462/github-actions-default-branch-variable
-        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-        uses: we-cli/coverage-badge-action@main
-  sonar:
-    name: Sonar
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
+        run: npm install # Replace with `yarn install` if using Yarn
+
+      - name: Run tests
+        run: npm run test -- --coverage # Replace with `yarn test --coverage` if using Yarn
+
+      - name: Upload coverage summary
+        uses: actions/upload-artifact@v3
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - uses: sonarsource/sonarqube-scan-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-  build:
-    needs: sonar  
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Login into Docker
-      env: 
-        DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
-        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
-      run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-    - name: Build the Docker image
-      run: docker build -t ${{env.REPO_NAME}}:latest .
-    - name: Push to DockerHub
-      run: docker push ${{env.REPO_NAME}}:latest
-  deploy:
-    runs-on: self-hosted
-    needs: build  
-    steps:
-      - name: Login into Docker
-        env: 
-          DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
-          DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
-        run: sudo docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      - name: Removing Old Docker Container
-        run: sudo docker rm -f actions-backend-server || true 
-      - name: Removing Old Docker Image
-        run: sudo docker rmi ${{env.REPO_NAME}}:latest || true
-      - name: Pulling Docker Image
-        run: sudo docker pull ${{env.REPO_NAME}}:latest
-      - name: Starting Docker Container
-        run: sudo docker run -d -p 3000:3000 --name actions-backend-server ${{env.REPO_NAME}}:latest
+          name: coverage-summary
+          path: coverage/coverage-summary.json
